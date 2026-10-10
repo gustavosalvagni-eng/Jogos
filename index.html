@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0e">
+  <meta name="description" content="Uma investigação lógica interativa inspirada no gênero de mini-mistérios. Jogue offline, examine pistas e resolva a matriz de dedução.">
+  <!-- PWA / instalação no iPhone -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Caso 001">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <title>MURDLE — O mistério do professor titular</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b0b0e;--surface:#121116;--surface2:#19171c;--ink:#eee9e4;--quiet:#b2aab0;--muted:#847982;--line:rgba(244,223,227,.13);--accent:#ff4e71;--accent-soft:rgba(255,78,113,.13);--ok:#d7eddf;--ease:cubic-bezier(.22,1,.36,1);--display:Georgia,"Times New Roman",serif;--sans:Inter,"Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;overflow-x:clip}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}button,select{font:inherit}button{cursor:pointer}a{color:inherit}::selection{background:var(--accent);color:#0b0b0e}
+    :focus-visible{outline:2px solid #ff9cb0;outline-offset:4px}button:disabled{opacity:.5;cursor:default}
+    #starfield{position:fixed;inset:0;z-index:-2;width:100%;height:100%;opacity:.72;pointer-events:none}body::before{content:"";position:fixed;inset:-15%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 68% 7%,rgba(255,65,102,.083),transparent 30%),radial-gradient(ellipse at 5% 83%,rgba(132,49,72,.13),transparent 31%),radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.60) 100%)}body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.09;z-index:20;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.26'/%3E%3C/svg%3E")}
+    .container{width:min(1480px,calc(100% - 112px));margin-inline:auto}.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.135em;text-transform:uppercase}.eyebrow{color:var(--accent);font-family:var(--mono);font-size:.71rem;letter-spacing:.16em;text-transform:uppercase;display:flex;gap:12px;align-items:center}.eyebrow::before{content:"";height:1px;width:32px;background:var(--accent)}.masthead{height:100px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);gap:16px;position:relative;z-index:3}.brand{font-family:var(--sans);font-weight:950;letter-spacing:-.095em;font-size:clamp(1.6rem,3vw,2.5rem);line-height:1;text-decoration:none}.brand .punct{color:var(--accent)}.brand-sub{margin:4px 0 0;font-size:.58rem;letter-spacing:.06em;color:var(--muted);font-family:var(--display);font-style:italic}.brand-stack{display:flex;align-items:center;gap:25px}.mast-mark{width:1px;height:35px;background:var(--line)}.mast-right{display:flex;align-items:center;gap:35px;color:var(--quiet)}.live-dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:100%;box-shadow:0 0 14px var(--accent);margin-right:9px}.link-button{appearance:none;background:none;border:0;color:var(--ink);padding:7px 0;border-bottom:1px solid var(--accent);font-size:.75rem;letter-spacing:.04em;transition:color .3s}.link-button:hover{color:var(--accent)}
+    .hero{padding:92px 0 105px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,.55fr);column-gap:60px;min-height:570px;align-items:end;position:relative}.hero::before{content:"001";font-size:clamp(180px,31vw,560px);font-weight:900;position:absolute;left:34%;top:4%;line-height:.8;letter-spacing:-.12em;color:rgba(230,183,192,.028);z-index:-1;pointer-events:none}.hero h1{font-family:var(--display);font-weight:500;letter-spacing:-.077em;font-size:clamp(3.9rem,8.2vw,9.7rem);line-height:.82;margin:23px 0 0;max-width:1080px}.hero h1 .h-line{display:block;white-space:nowrap}.hero h1 .accent-type{color:var(--accent);font-style:italic;font-weight:400}.hero h1 .letter{display:inline-block;animation:letterIn .85s var(--ease) backwards;animation-delay:calc(120ms + var(--i)*38ms);transform-origin:bottom center}.hero h1{position:relative}.hero h1::after{content:"";position:absolute;inset:-8% 0 -5%;width:22%;pointer-events:none;transform:translateX(-220%);background:linear-gradient(90deg,transparent,rgba(255,155,174,.065),transparent);animation:scan 2s ease-out .9s both}.hero-strap{font-size:clamp(.85rem,1.2vw,1.02rem);letter-spacing:.1em;color:var(--quiet);text-transform:uppercase;margin-top:34px}.hero-strap b{color:var(--ink);font-weight:500}.hero-side{border-left:1px solid var(--line);padding-left:37px;align-self:end;padding-bottom:4px}.case-number{display:flex;align-items:end;justify-content:space-between;padding-bottom:25px;border-bottom:1px solid var(--line)}.case-number strong{font-family:var(--display);font-size:clamp(3.3rem,5vw,5.8rem);letter-spacing:-.07em;font-weight:400;line-height:1}.case-number small{color:var(--quiet);font-size:.65rem}.hero-side p{font-family:var(--display);font-style:italic;color:#d1c6ca;line-height:1.55;font-size:1.3rem;margin:26px 0}.hero-side .date{font-size:.68rem;color:var(--accent);border-top:1px solid var(--line);padding-top:20px}
+    .section-marker{margin:0 0 19px;color:var(--muted)}.game-stage{display:grid;grid-template-columns:minmax(255px,.61fr) minmax(0,1.39fr);gap:38px;align-items:start;position:relative}.case-file{padding:24px 32px 30px 0;border-top:1px solid var(--line);position:relative}.case-file h2{font-family:var(--display);font-size:clamp(2rem,3vw,3.4rem);font-weight:400;line-height:1.02;letter-spacing:-.045em;margin:25px 0 22px}.case-file .story{font-family:var(--display);color:#d4c9ce;font-size:1.13rem;line-height:1.72;margin:0 0 20px}.case-file .story::first-letter{font-size:3.5rem;float:left;margin:2px 8px -12px 0;color:var(--accent);line-height:1}.original{color:var(--quiet);line-height:1.65;font-size:.86rem;margin:16px 0}.original em{color:var(--ink)}.source-heading{margin-top:32px;padding-top:23px;border-top:1px solid var(--line);color:var(--muted)}.source-heading strong{display:block;margin-top:8px;color:var(--quiet);letter-spacing:.015em;font-weight:500;line-height:1.6;text-transform:none}.intro-instructions{font-size:.81rem;line-height:1.65;color:var(--muted);font-family:var(--display);font-style:italic;border-left:2px solid var(--accent);padding-left:17px;margin-top:23px}.inline-toggle{color:var(--accent);text-decoration:underline;text-underline-offset:3px;border:0;padding:0;background:transparent;font:inherit}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:39px}.stat{background:rgba(255,255,255,.025);padding:17px 14px 13px;border-top:1px solid var(--line)}.stat strong{display:block;font-size:2.2rem;letter-spacing:-.06em;font-weight:400;font-family:var(--display)}.stat small{color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;line-height:1.3}
+    .workbench{border:1px solid rgba(255,232,238,.19);border-radius:16px 4px 16px 4px;background:linear-gradient(145deg,rgba(42,33,40,.6),rgba(17,17,20,.94) 52%);box-shadow:0 24px 100px rgba(0,0,0,.27),inset 0 1px rgba(255,255,255,.052);padding:29px 27px 27px;position:relative;overflow:hidden;backdrop-filter:blur(8px)}.workbench::before{content:"";position:absolute;right:-70px;top:-80px;width:240px;height:200px;border-radius:50%;background:rgba(255,70,104,.09);filter:blur(60px);pointer-events:none}.workbench-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:21px;gap:14px}.workbench h2{margin:6px 0 0;font-size:clamp(1.45rem,2vw,2.1rem);font-family:var(--display);font-weight:400;letter-spacing:-.035em}.signal{font-family:var(--mono);font-size:.65rem;color:var(--accent);letter-spacing:.08em;white-space:nowrap}.toolbelt{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:19px 0 8px}.toolbelt p{margin:0;color:var(--muted);font-size:.76rem;line-height:1.5}.toolbelt b{color:var(--ink);font-weight:600}.ghost-btn{background:transparent;color:var(--quiet);border:1px solid var(--line);border-radius:3px 9px 3px 9px;padding:9px 12px;font-family:var(--mono);font-size:.65rem;letter-spacing:.03em;white-space:nowrap;transition:border-color .25s,color .25s}.ghost-btn:hover{color:var(--ink);border-color:var(--accent)}
+    .matrix-scroll{overflow:auto;max-width:100%;padding:14px 0 5px;scrollbar-color:var(--accent) #18151a;scrollbar-width:thin}.matrix-scroll:focus-visible{outline-offset:-2px}.logic-grid{min-width:610px;display:grid;grid-template-columns:111px repeat(6,minmax(0,1fr));gap:4px;align-items:stretch}.matrix-group{font-family:var(--mono);font-size:.63rem;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;padding:12px 4px 7px;border-bottom:1px solid var(--line);text-align:center}.matrix-group.sus{grid-column:2/span 3}.matrix-group.loc{grid-column:5/span 3}.matrix-header{min-height:59px;display:flex;align-items:end;justify-content:center;text-align:center;color:#e1d3d8;font-size:.67rem;line-height:1.22;padding:7px 2px 9px;word-break:normal}.matrix-header .initial{font-family:var(--display);color:var(--accent);display:block;font-size:1.4rem;font-weight:400;margin-bottom:5px}.row-label{display:flex;align-items:center;gap:10px;min-height:64px;font-size:.74rem;line-height:1.22;padding:4px 5px;color:#e3d7db}.row-label .id{display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 26px;border:1px solid rgba(255,78,113,.48);background:var(--accent-soft);color:var(--accent);font-family:var(--display);font-style:italic;border-radius:50%}.row-label.loc-label .id{border-color:var(--line);color:#dbd0d3;background:rgba(255,255,255,.04)}.cell{background:rgba(241,229,233,.045);border:1px solid rgba(244,218,225,.12);min-height:62px;display:grid;place-items:center;color:var(--ink);font-family:var(--display);font-size:2.1rem;font-weight:500;transition:background .26s var(--ease),border-color .26s var(--ease),transform .26s var(--ease),box-shadow .26s var(--ease);position:relative;padding:1px}.cell:hover{background:rgba(255,78,113,.125);border-color:rgba(255,78,113,.53);z-index:2;transform:scale(1.035)}.cell[data-state="no"]{color:#807780;background:rgba(255,255,255,.02);font-family:var(--sans);font-size:1.4rem;font-weight:300}.cell[data-state="yes"]{color:var(--accent);background:rgba(255,78,113,.15);border-color:rgba(255,78,113,.63);box-shadow:inset 0 0 28px rgba(255,78,113,.045)}.cell[data-state="yes"]::after{content:"";position:absolute;inset:4px;border:1px solid rgba(255,78,113,.17);pointer-events:none}.matrix-void{grid-column:5/span 3;align-self:stretch;margin-left:9px;border:1px dashed rgba(255,78,113,.16);background:linear-gradient(130deg,rgba(255,78,113,.034),transparent);display:grid;place-content:center;text-align:center;padding:15px;gap:11px}.matrix-void svg{width:43px;height:43px;margin:auto;color:var(--accent);opacity:.55}.matrix-void span{font-size:.62rem;line-height:1.6;letter-spacing:.095em;color:var(--muted)}.matrix-help{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:17px;padding-top:17px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.63rem;color:var(--muted);line-height:1.6}.mark{color:var(--accent);font-size:1.05rem;font-weight:600;vertical-align:-2px;margin-right:3px}.matrix-help span:nth-child(2){text-align:right}.swipe-tip{display:none}
+    .roster{margin-top:24px;border-top:1px solid var(--line);padding-top:21px}.roster-title{color:var(--muted);margin:0 0 14px}.roster-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.roster-btn{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:2px 8px 2px 8px;padding:12px 8px;text-align:left;min-height:65px;transition:transform .3s var(--ease),background .3s,border-color .3s;color:var(--ink)}.roster-btn:hover,.roster-btn[aria-expanded="true"]{border-color:rgba(255,78,113,.5);background:var(--accent-soft);transform:translateY(-2px)}.roster-btn strong{font-size:.76rem;display:block;line-height:1.2;font-weight:500}.roster-btn small{font-size:.57rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;display:block;margin-top:6px}.profile{border-left:2px solid var(--accent);margin-top:12px;padding:7px 0 7px 15px;font-size:.82rem;color:var(--quiet);line-height:1.65;min-height:56px}.profile strong{color:var(--ink);font-weight:600}.profile[hidden]{display:none}
+    .clue-section{padding:105px 0 86px}.section-heading{display:grid;grid-template-columns:1fr minmax(0,.58fr);gap:30px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:24px}.section-heading h2{font-family:var(--display);font-size:clamp(3.1rem,6vw,6.7rem);letter-spacing:-.065em;line-height:.94;font-weight:400;margin:19px 0 0}.section-heading .section-note{max-width:330px;font-size:.84rem;line-height:1.65;color:var(--quiet);justify-self:end}.clue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;grid-auto-flow:row}.clue{border:1px solid rgba(252,220,228,.15);background:rgba(21,19,23,.87);border-radius:3px 14px 4px 4px;min-height:205px;text-align:left;color:var(--ink);position:relative;overflow:hidden;padding:27px;display:flex;flex-direction:column;justify-content:space-between;isolation:isolate;transition:border-color .35s,transform .4s var(--ease),box-shadow .4s var(--ease)}.clue:hover{transform:translateY(-4px);border-color:rgba(255,78,113,.53);box-shadow:0 19px 55px rgba(0,0,0,.19)}.clue:focus-visible{outline-offset:0}.clue::before{content:"";position:absolute;inset:0;background:linear-gradient(143deg,rgba(255,78,113,.09),transparent 55%);opacity:.25;transition:opacity .4s;z-index:-1}.clue:hover::before{opacity:1}.clue.feature{grid-column:span 2;min-height:300px;background:linear-gradient(128deg,#34131f,#190e15 75%);border-color:rgba(255,78,113,.28)}.clue.final-clue{grid-column:span 3;min-height:150px;border-radius:12px 4px 12px 4px;flex-direction:row;align-items:center;gap:20px}.clue-index{font-family:var(--mono);font-size:.66rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}.clue-icon{position:absolute;top:13%;right:6%;font-size:clamp(3rem,8vw,8rem);font-family:var(--display);line-height:1;color:rgba(255,255,255,.065);font-style:italic;pointer-events:none}.clue-title{font-family:var(--display);font-size:clamp(1.15rem,1.9vw,1.8rem);font-weight:400;line-height:1.2;max-width:84%;margin:18px 0 14px}.clue.feature .clue-title{font-size:clamp(1.6rem,3.7vw,3.8rem)}.clue[data-flipped="true"] .clue-title{font-family:var(--sans);font-size:clamp(.99rem,1.5vw,1.35rem);line-height:1.5;letter-spacing:-.02em;max-width:95%;font-weight:450}.clue[data-flipped="true"].feature .clue-title{font-size:clamp(1.15rem,2.1vw,1.9rem)}.clue-action{font-family:var(--mono);font-size:.63rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase}.clue-action::after{content:" →";color:var(--accent);font-size:.95rem}.clue[data-flipped="true"] .clue-action{color:var(--accent)}.clue.final-clue .clue-title{margin:6px 0 0;max-width:780px}.clue.final-clue .clue-icon{top:6%;font-size:5rem}.clue-note{margin-top:14px;color:var(--muted);font-size:.74rem;line-height:1.5;font-style:italic}.clue-detail{display:none;font-size:.77rem;line-height:1.55;color:var(--quiet);margin:0 0 9px}.clue[data-detailed="true"] .clue-detail{display:block}
+    .verdict{border-top:1px solid var(--line);padding:46px 0 95px;display:grid;grid-template-columns:minmax(250px,.77fr) minmax(0,1.23fr);gap:65px}.verdict-heading h2{font-family:var(--display);font-size:clamp(2.7rem,4.4vw,5rem);font-weight:400;letter-spacing:-.063em;line-height:1;margin:23px 0 14px}.verdict-heading p{color:var(--quiet);font-size:.9rem;line-height:1.7;max-width:390px}.verdict-form{padding:32px;border:1px solid var(--line);border-top:2px solid var(--accent);background:rgba(19,18,22,.84);border-radius:2px 14px 2px 14px}.selector-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.field-label{display:block;color:var(--muted);font-size:.63rem;letter-spacing:.13em;font-family:var(--mono);text-transform:uppercase;margin-bottom:10px}.verdict select{appearance:none;width:100%;height:52px;background:#211c23;border:1px solid rgba(245,219,226,.22);border-radius:2px 7px 2px 7px;color:var(--ink);font-size:.86rem;min-width:0;padding:0 28px 0 13px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3E%3Cpath d='m1 1 6 6 6-6' stroke='%23ff4e71' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}.verdict select:hover{border-color:rgba(255,78,113,.6)}.verdict select option{background:#18151a;color:#fff}.verdict-actions{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-top:25px;flex-wrap:wrap}.primary-btn{border:1px solid var(--accent);background:var(--accent);color:#1a0710;border-radius:2px 12px 2px 12px;padding:14px 23px;font-size:.79rem;font-weight:800;text-transform:uppercase;letter-spacing:.075em;transition:transform .28s var(--ease),box-shadow .28s var(--ease),background .28s}.primary-btn:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(255,78,113,.28);background:#ff7790}.quiet-btn{border:0;background:transparent;color:var(--muted);font-size:.72rem;text-decoration:underline;text-underline-offset:4px;padding:8px;transition:color .25s}.quiet-btn:hover{color:var(--ink)}.result{margin-top:23px;border-left:2px solid var(--accent);padding:15px 19px;background:rgba(255,78,113,.07);line-height:1.55;font-size:.86rem;color:#f1d4dc}.result strong{display:block;color:var(--ink);font-family:var(--display);font-size:1.3rem;margin-bottom:7px;font-weight:400}.result[data-kind="success"]{border-left-color:#adceb8;background:rgba(161,212,173,.065);color:#d7e8dc}.result[hidden]{display:none}
+    .colophon{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:start;border-top:1px solid var(--line);padding:24px 0 47px;color:var(--muted);font-size:.73rem;line-height:1.7}.colophon strong{color:var(--quiet);font-weight:500}.colophon div:last-child{text-align:right}
+    .reveal{opacity:0;transform:translateY(22px);transition:opacity 1.05s var(--ease),transform 1.05s var(--ease)}.reveal.visible{opacity:1;transform:none}
+    @keyframes letterIn{from{opacity:0;filter:blur(13px);transform:translateY(29px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}@keyframes scan{0%{transform:translateX(-220%);opacity:0}35%{opacity:1}100%{transform:translateX(600%);opacity:0}}
+    @media(max-width:1170px){.container{width:min(100% - 68px,1480px)}.hero{grid-template-columns:1fr .5fr;gap:20px;min-height:500px}.hero h1{font-size:clamp(4.4rem,9vw,8rem)}.game-stage{grid-template-columns:1fr;gap:23px}.case-file{display:grid;grid-template-columns:1fr .9fr;gap:0 36px}.case-file h2,.case-file .section-marker{grid-column:span 2}.case-file .story{grid-row:3/span 3}.case-file .source-heading{margin-top:0}.case-file .stats{grid-column:span 2;max-width:480px}.intro-instructions{grid-column:2}.workbench{padding:28px}.verdict{gap:30px}}
+    @media(max-width:760px){.container{width:calc(100% - 36px)}.masthead{height:77px}.brand{font-size:2rem}.brand-sub{font-size:.51rem}.mast-right{gap:0}.mast-right .mono{display:none}.mast-mark{display:none}.hero{padding:65px 0 62px;display:block;min-height:unset}.hero h1{font-size:clamp(3.5rem,11.5vw,6.6rem);margin-top:22px}.hero-side{display:flex;gap:25px;justify-content:space-between;align-items:center;padding:18px 0 0;margin-top:35px;border-left:0;border-top:1px solid var(--line)}.hero-side p{font-size:1rem;margin:0;max-width:240px}.case-number{padding:0;border:0;gap:14px;flex-direction:column;align-items:start}.case-number strong{font-size:3rem}.hero-side .date{display:none}.hero-strap{font-size:.7rem;line-height:1.5;margin-top:22px}.case-file{display:block;padding:22px 0 10px}.case-file .source-heading{margin-top:23px}.case-file h2{font-size:2.55rem}.stats{margin-top:25px}.workbench{padding:17px 14px}.workbench-top{padding:6px 0 20px}.workbench h2{font-size:1.6rem}.signal{font-size:.55rem}.toolbelt{align-items:start;gap:8px}.toolbelt p{font-size:.68rem}.ghost-btn{font-size:.57rem;padding:9px 8px}.logic-grid{min-width:590px}.swipe-tip{display:block;color:var(--accent);font-size:.68rem;margin:10px 0 1px}.roster-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.roster-btn{padding:11px 5px}.roster-btn strong{font-size:.69rem}.roster-btn small{font-size:.51rem}.clue-section{padding:82px 0 66px}.section-heading{display:block;padding-bottom:19px}.section-heading h2{font-size:3.5rem}.section-heading .section-note{max-width:100%;margin:17px 0 0;font-size:.81rem}.clue-grid{grid-template-columns:1fr 1fr;gap:9px}.clue.feature{grid-column:span 2;min-height:230px}.clue{min-height:193px;padding:20px}.clue.final-clue{grid-column:span 2;min-height:145px}.clue-title{font-size:1.4rem}.clue[data-flipped="true"] .clue-title{font-size:1rem}.clue.feature .clue-title{font-size:2rem}.clue[data-flipped="true"].feature .clue-title{font-size:1.45rem}.clue-action{font-size:.57rem}.verdict{display:block;padding:38px 0 65px}.verdict-heading h2{font-size:3.3rem}.verdict-form{margin-top:26px;padding:22px}.selector-row{grid-template-columns:1fr;gap:17px}.verdict select{height:49px}.colophon{grid-template-columns:1fr;gap:12px}.colophon div:last-child{text-align:left}}
+    @media(max-width:410px){.hero h1{font-size:clamp(3rem,11vw,4.15rem)}.hero-side p{font-size:.89rem}.matrix-help{display:block}.matrix-help span:nth-child(2){display:block;text-align:left;margin-top:5px}.clue{padding:15px}.clue-title{font-size:1.25rem}.clue[data-flipped="true"] .clue-title{font-size:.91rem}.roster-list{grid-template-columns:1fr 1fr 1fr}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.hero h1 .letter{opacity:1;filter:none;transform:none}}
+
+    /* PWA: pequeno módulo de instalação, sem alterar o jogo principal. */
+    .install-cta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:35px;align-items:end;padding:65px 0 75px;margin-top:5px;border-top:1px solid var(--line)}
+    .install-cta .mono{color:var(--accent)}.install-cta h2{font-family:var(--display);font-weight:400;font-size:clamp(2.25rem,4vw,5rem);line-height:.95;letter-spacing:-.05em;margin:20px 0 15px}.install-cta h2 em{color:var(--accent);font-weight:400}
+    .install-cta p{max-width:610px;color:var(--quiet);line-height:1.65;font-size:.88rem}.install-actions{display:grid;justify-items:end;gap:15px;padding-bottom:8px}
+    .install-action{appearance:none;background:var(--accent);border:1px solid #ff7794;border-radius:3px 13px 3px 13px;color:#150a0f;padding:17px 24px;font-size:.8rem;font-weight:800;letter-spacing:.025em;white-space:nowrap;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+    .install-action:hover{transform:translateY(-3px);box-shadow:0 15px 36px rgba(255,78,113,.20)}.install-action:focus-visible{outline:2px solid white;outline-offset:5px}
+    .install-status{font-size:.68rem;color:var(--muted);max-width:245px;text-align:right;line-height:1.6;min-height:22px}
+    .update-button{background:none;color:var(--accent);border:0;border-bottom:1px solid currentColor;font-size:.76rem;padding:5px;white-space:normal;text-align:right}
+    #install-dialog{width:min(490px,calc(100% - 32px));max-height:calc(100% - 45px);overflow:auto;background:#19151b;color:var(--ink);border:1px solid #6c3749;border-radius:18px 4px 18px 4px;box-shadow:0 35px 100px rgba(0,0,0,.8);padding:30px 32px}
+    #install-dialog::backdrop{background:rgba(0,0,0,.76);backdrop-filter:blur(5px)}
+    #install-dialog h2{font:400 clamp(1.8rem,4vw,2.7rem)/1.1 var(--display);letter-spacing:-.04em;margin:14px 0 15px}
+    #install-dialog p,#install-dialog li{line-height:1.7;color:var(--quiet);font-size:.9rem}
+    #install-dialog ol{padding-left:22px}#install-dialog li{margin:8px 0}#install-dialog strong{color:var(--ink)}
+    .install-dialog-actions{display:flex;justify-content:flex-end;margin-top:21px}.install-close{color:var(--ink);border:1px solid var(--line);padding:11px 18px;border-radius:3px;background:rgba(255,255,255,.04)}
+    @media(max-width:760px){.install-cta{grid-template-columns:1fr;gap:20px;padding:45px 0 55px}.install-actions{justify-items:start}.install-status{text-align:left}.install-cta h2{font-size:clamp(2.5rem,9vw,3.5rem)}#install-dialog{padding:24px}}
+  </style>
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <header class="masthead container">
+    <div class="brand-stack"><div><a class="brand" href="#inicio" aria-label="Murdle, início">MURDLE<span class="punct">.</span></a><p class="brand-sub">Mystery Puzzles by G. T. Karber</p></div><span class="mast-mark" aria-hidden="true"></span></div>
+    <div class="mast-right"><span class="mono"><span class="live-dot" aria-hidden="true"></span>Arquivo / caso 001</span><button class="link-button" type="button" id="btn-instructions">Como jogar ↗</button></div>
+  </header>
+
+  <main id="inicio" class="container">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">Daily mini-murdle &nbsp; / &nbsp; 11 out 2025</div>
+        <h1 id="hero-title" aria-label="The Dead Tenured Professor"><span class="h-line" data-letters="THE DEAD">THE DEAD</span><span class="h-line accent-type" data-letters="TENURED">TENURED</span><span class="h-line" data-letters="PROFESSOR">PROFESSOR</span></h1>
+        <div class="hero-strap"><b>Deductive Logico solves the mystery</b> / mini-murdle for Oct 11, 2025</div>
+      </div>
+      <aside class="hero-side" aria-label="Identificação do caso">
+        <div class="case-number"><small class="mono">Case file / N°</small><strong>01</strong></div>
+        <p>“Elementary, my dear Irratino!”</p>
+        <div class="date mono">11 October / 2025 &nbsp; • &nbsp; Mystery archive</div>
+      </aside>
+    </section>
+
+    <div class="game-stage" id="investigacao">
+      <aside class="case-file reveal" aria-labelledby="case-title">
+        <div class="section-marker mono">01 — Relatório de abertura</div>
+        <h2 id="case-title">Um crime.<br>Três versões.</h2>
+        <p class="story">“Elementary, my dear Irratino!”, Deductive Logico said, recalling one of his earliest cases. “Or rather, should I say, collegiate?” Way back when he was a sophomore, a tenured professor had been murdered.</p>
+        <div class="source-heading mono">O desafio original<strong>Deductive Logico solves the mystery of the dead tenured professor</strong></div>
+        <p class="original">By solving this mini-murdle, you will learn the skills required to be a great detective. First, flip over the cards below, and then tap again to learn more about each one. <span id="hint-instruction">(To disable these hints, <button class="inline-toggle" id="toggle-hints" type="button">click here</button>.)</span></p>
+        <p class="intro-instructions" id="instructions-pt">Nesta adaptação jogável, revele as pistas, relacione pessoas, objetos e locais na matriz. Toque uma vez para marcar <b>×</b> (não); duas para <b>✓</b> (sim); três para limpar. Ao final, apresente a acusação.</p>
+        <div class="stats" aria-label="Elementos do caso">
+          <div class="stat"><strong data-count="3">3</strong><small>Suspeitos</small></div>
+          <div class="stat"><strong data-count="3">3</strong><small>Objetos</small></div>
+          <div class="stat"><strong data-count="3">3</strong><small>Locais</small></div>
+        </div>
+      </aside>
+
+      <section class="workbench reveal" aria-labelledby="matrix-title">
+        <div class="workbench-top"><div><div class="mono" style="color:var(--muted)">Quadro / investigação ativa</div><h2 id="matrix-title">Matriz de dedução</h2></div><div class="signal" id="board-status" aria-live="polite">● NÃO RESOLVIDO</div></div>
+        <div class="toolbelt"><p><b>×</b> descartar &nbsp; <b>✓</b> confirmar &nbsp; <b>·</b> limpar</p><button class="ghost-btn" id="clear-board" type="button">Limpar matriz ↺</button></div>
+        <p class="swipe-tip">← Deslize a matriz para explorar →</p>
+        <div class="matrix-scroll" tabindex="0" aria-label="Matriz lógica, deslize horizontalmente em telas menores">
+          <div class="logic-grid" id="logic-grid" role="group" aria-label="Relações entre objetos, suspeitos e locais"></div>
+        </div>
+        <div class="matrix-help"><span><span class="mark">×</span> incompatível &nbsp; <span class="mark">✓</span> compatível</span><span id="connections">0 / 9 conexões assinaladas</span></div>
+        <div class="roster"><p class="roster-title mono">Toque em uma identidade para abrir o perfil</p><div class="roster-list" id="roster"></div><div class="profile" id="profile" hidden role="status" aria-live="polite"></div></div>
+      </section>
+    </div>
+
+    <section class="clue-section" id="pistas" aria-labelledby="clue-title">
+      <div class="section-heading reveal"><div><div class="eyebrow">02 / Dossiê confidencial</div><h2 id="clue-title">As pistas<span style="color:var(--accent)">.</span></h2></div><p class="section-note">Seis peças de evidência. Toque nos cartões para revelar depoimentos e perícias. Um segundo toque apresenta a nota investigativa.</p></div>
+      <div class="clue-grid" id="clue-grid"></div>
+      <p class="clue-note"><span id="clue-progress">0 de 6 pistas reveladas</span> · As pistas desta versão foram criadas para uma investigação original baseada na imagem de referência.</p>
+    </section>
+
+    <section class="verdict reveal" id="veredito" aria-labelledby="verdict-title">
+      <div class="verdict-heading"><div class="eyebrow">03 / O veredito</div><h2 id="verdict-title">Quem matou<br>o professor?</h2><p>Apresente uma combinação de culpado, objeto e local. A decisão é conferida pelo próprio jogo — sem respostas produzidas por IA.</p></div>
+      <form id="accusation-form" class="verdict-form">
+        <div class="selector-row"><div><label for="suspect-select" class="field-label">01 / Culpado</label><select id="suspect-select" required><option value="">Selecionar pessoa</option></select></div><div><label for="weapon-select" class="field-label">02 / Objeto</label><select id="weapon-select" required><option value="">Selecionar objeto</option></select></div><div><label for="location-select" class="field-label">03 / Local</label><select id="location-select" required><option value="">Selecionar local</option></select></div></div>
+        <div class="verdict-actions"><button class="primary-btn" type="submit">Conferir acusação ↗</button><button type="button" class="quiet-btn" id="reveal-answer">Revelar solução</button></div>
+        <div class="result" id="verdict-result" hidden role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <section class="container install-cta reveal" aria-labelledby="install-title">
+    <div><span class="mono">04 — O caso no seu iPhone</span><h2 id="install-title">Leve a investigação<br><em>para qualquer lugar.</em></h2>
+    <p>Adicione o jogo à Tela de Início do iPhone e continue sua investigação sem internet. Seu progresso fica neste dispositivo.</p></div>
+    <div class="install-actions"><button type="button" class="install-action" id="pwa-install">Instalar no iPhone ↗</button><span class="install-status" id="pwa-status" role="status" aria-live="polite">Verificando modo offline…</span><button type="button" class="update-button" id="pwa-update" hidden>Atualizar para a nova versão ↻</button></div>
+  </section>
+
+  <dialog id="install-dialog" aria-labelledby="install-dialog-title">
+    <div class="mono" style="color:var(--accent)">Instalação / iOS</div><h2 id="install-dialog-title">Instale em três toques.</h2>
+    <p>Depois de publicar o jogo em um endereço <strong>HTTPS</strong>, abra esse endereço no <strong>Safari do iPhone</strong>:</p>
+    <ol><li>Toque em <strong>Compartilhar</strong> (ícone de quadrado com seta; em algumas versões, dentro do menu da página).</li><li>Escolha <strong>Adicionar à Tela de Início</strong>.</li><li>Se aparecer a opção <strong>Abrir como App</strong>, mantenha ativada e toque em <strong>Adicionar</strong>.</li></ol>
+    <p>Abra uma vez com internet para armazenar o jogo. Depois, ele funciona offline. O arquivo HTML aberto diretamente por <strong>file://</strong> pode ser jogado, mas não instala uma PWA.</p>
+    <div class="install-dialog-actions"><button type="button" class="install-close" id="install-close">Entendi / Fechar</button></div>
+  </dialog>
+
+  <footer class="container colophon"><div><strong>Projeto demonstrativo independente.</strong> Jogo lógico criado a partir da imagem enviada. Referência textual preservada onde legível; personagens, provas e solução desta adaptação são originais. Não é produto oficial nem possui afiliação com Murdle ou G. T. Karber.</div><div>HTML único · Offline · Sem bibliotecas externas · Progresso salvo neste navegador</div></footer>
+
+  <script>
+  (() => {
+    'use strict';
+    const KEY = 'case001_noir_v2';
+    const suspects = [
+      {id:'iris',name:'Dra. Íris',short:'Íris',role:'Assistente de pesquisa',info:'Íris organizava os registros acadêmicos do professor e tinha acesso às salas administrativas.'},
+      {id:'caio',name:'Caio Leme',short:'Caio',role:'Pós-graduando',info:'Caio estudava botânica. Na noite do crime, alguém o identificou perto das áreas externas.'},
+      {id:'violeta',name:'Violeta Moura',short:'Violeta',role:'Técnica de laboratório',info:'Violeta tinha conhecimento dos reagentes e questionava o parecer do professor sobre seu trabalho.'}
+    ];
+    const weapons = [
+      {id:'apple',name:'Maçã',short:'Maçã',info:'Uma maçã aparentemente comum. A perícia detectou substância tóxica em sua casca.'},
+      {id:'bag',name:'Bolsa',short:'Bolsa',info:'Uma bolsa de couro pesada foi recolhida para comparação de vestígios.'},
+      {id:'glasses',name:'Óculos',short:'Óculos',info:'Óculos protetores pertencentes ao laboratório — embora não tenham sido usados no crime.'}
+    ];
+    const locations = [
+      {id:'office',name:'Gabinete',short:'Gabinete',info:'Sala do professor. Havia papéis revirados, mas a perícia descartou ali a causa fatal.'},
+      {id:'lab',name:'Laboratório',short:'Laboratório',info:'O laboratório de química guardava reagentes e a evidência que decidiu o caso.'},
+      {id:'garden',name:'Jardins',short:'Jardins',info:'Os jardins do campus foram vistos por testemunhas pouco antes de o corpo ser descoberto.'}
+    ];
+    const clues = [
+      {cover:'O depoimento da noite',detail:'Testemunha / 21h10',text:'Caio Leme foi visto nos jardins durante o intervalo em que ocorreu o crime.',note:'Marque a relação de Caio com os jardins na parte inferior da matriz.'},
+      {cover:'O objeto encontrado',detail:'Perícia / inventário',text:'A maçã foi encontrada no laboratório. Não havia outra maçã entre os objetos investigados.',note:'Relacione Maçã × Laboratório no quadrante superior direito.'},
+      {cover:'Uma pista descartada',detail:'Objetos / localização',text:'A bolsa de couro não esteve nos jardins naquela noite.',note:'Uma exclusão também reduz as possibilidades dos demais objetos.'},
+      {cover:'O álibi incompleto',detail:'Depoimento / Violeta',text:'Violeta Moura não entrou no gabinete do professor na noite do crime.',note:'Use a exclusão para localizar a suspeita entre os outros dois lugares.'},
+      {cover:'Vestígio inesperado',detail:'Perícia / objetos',text:'Os óculos de proteção foram encontrados com a pessoa que esteve nos jardins.',note:'Cada pessoa carregava apenas um dos três objetos.'},
+      {cover:'O laudo decisivo',detail:'Causa da morte',text:'A morte foi causada por veneno aplicado na maçã. Quem transportava a maçã matou o professor no local onde ela foi encontrada.',note:'A combinação final exige culpado, objeto e local — não basta um único acerto.'}
+    ];
+    // Um objeto por pessoa e por local, cada pessoa visitou apenas um local.
+    // Provas escolhidas para que as cinco pistas de associação tenham solução única.
+    const answer={suspect:'violeta',weapon:'apple',location:'lab'};
+    const mappings={ws:[2,0,1],wl:[1,0,2],ls:[0,2,1]};
+    const grid=document.getElementById('logic-grid');
+    const roster=document.getElementById('roster');
+    const profile=document.getElementById('profile');
+    const clueGrid=document.getElementById('clue-grid');
+    const result=document.getElementById('verdict-result');
+    const progress=document.getElementById('clue-progress');
+    const connections=document.getElementById('connections');
+    let state={marks:{},revealed:[],detailed:[],won:false,attempts:0};
+    let reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved && typeof saved==='object')state={...state,...saved,marks:saved.marks&&typeof saved.marks==='object'?saved.marks:{},revealed:Array.isArray(saved.revealed)?saved.revealed:[],detailed:Array.isArray(saved.detailed)?saved.detailed:[]};}catch(_e){/* Storage unavailable: playable without persistence. */}
+    const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_e){/* Browsers with blocked storage still work. */}};
+    const elem=(tag,css,text)=>{const el=document.createElement(tag);if(css)el.className=css;if(text!==undefined)el.textContent=text;return el;};
+    const addText=(node,txt,css)=>{const el=elem('span',css,txt);node.append(el);return el;};
+    function place(el,column,row,span=1){el.style.gridColumn=span===1?String(column):`${column} / span ${span}`;el.style.gridRow=String(row);return el;}
+    function boardCell(group,r,c,labels){
+      const id=`${group}-${r}-${c}`;
+      const b=elem('button','cell');b.type='button';b.dataset.id=id;
+      const stateValue=state.marks[id]||0;
+      b.dataset.state=stateValue===0?'empty':stateValue===1?'no':'yes';
+      b.textContent=stateValue===1?'×':stateValue===2?'✓':'';
+      b.setAttribute('aria-label',`${labels[0]} e ${labels[1]}: ${stateValue===1?'incompatível':stateValue===2?'compatível':'não marcado'}. Ativar para alterar.`);
+      b.setAttribute('aria-pressed',stateValue===2?'true':'false');
+      b.addEventListener('click',()=>{
+        if(state.won)return;
+        const next=((state.marks[id]||0)+1)%3;
+        state.marks[id]=next;
+        if(next===2){for(let i=0;i<3;i++){if(i!==c)state.marks[`${group}-${r}-${i}`]=1;if(i!==r)state.marks[`${group}-${i}-${c}`]=1;}}
+        save();renderBoard();
+      });
+      return b;
+    }
+    function renderBoard(){
+      grid.replaceChildren();
+      grid.append(place(elem('div','matrix-group sus','Suspeitos'),2,1,3),place(elem('div','matrix-group loc','Locais'),5,1,3));
+      for(const [index,person] of suspects.entries()){const header=elem('div','matrix-header');const group=elem('div');addText(group,person.short[0],'initial');addText(group,person.short);header.append(group);grid.append(place(header,index+2,2));}
+      for(const [index,loc] of locations.entries()){const header=elem('div','matrix-header');const group=elem('div');addText(group,loc.short[0],'initial');addText(group,loc.short);header.append(group);grid.append(place(header,index+5,2));}
+      for(let r=0;r<3;r++){
+        const label=elem('div','row-label');addText(label,String(r+1),'id');addText(label,weapons[r].short);grid.append(place(label,1,r+3));
+        for(let c=0;c<3;c++)grid.append(place(boardCell('ws',r,c,[weapons[r].name,suspects[c].name]),c+2,r+3));
+        for(let c=0;c<3;c++)grid.append(place(boardCell('wl',r,c,[weapons[r].name,locations[c].name]),c+5,r+3));
+      }
+      for(let r=0;r<3;r++){
+        const label=elem('div','row-label loc-label');addText(label,String(r+4),'id');addText(label,locations[r].short);grid.append(place(label,1,r+6));
+        for(let c=0;c<3;c++)grid.append(place(boardCell('ls',r,c,[locations[r].name,suspects[c].name]),c+2,r+6));
+        if(r===0){const voidCell=elem('div','matrix-void');voidCell.style.gridRow='6 / span 3';voidCell.style.gridColumn='5 / span 3';voidCell.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><circle cx="21" cy="21" r="12"/><path d="m31 31 12 12M17 21h8m-4-4v8"/><circle cx="21" cy="21" r="18" stroke-dasharray="1 6"/></svg><span>CRUZAMENTO<br>DE EVIDÊNCIAS / 001</span>';grid.append(voidCell);}
+      }
+      const yes=Object.values(state.marks).filter(v=>v===2).length;
+      connections.textContent=`${yes} / 9 conexões assinaladas`;
+      document.getElementById('board-status').textContent=state.won?'✓ CASO RESOLVIDO':'● NÃO RESOLVIDO';
+    }
+    function renderRoster(){
+      roster.replaceChildren();const items=[...suspects,...weapons,...locations];
+      for(const item of items){const b=elem('button','roster-btn');b.type='button';b.setAttribute('aria-expanded','false');const strong=elem('strong','',item.name);const small=elem('small','',suspects.includes(item)?'Suspeito':weapons.includes(item)?'Objeto':'Local');b.append(strong,small);b.addEventListener('click',()=>{const expanded=b.getAttribute('aria-expanded')==='true';for(const sib of roster.children)sib.setAttribute('aria-expanded','false');b.setAttribute('aria-expanded',expanded?'false':'true');profile.hidden=expanded;if(!expanded){profile.replaceChildren(elem('strong','',`${item.name} — `),document.createTextNode(item.info));}});roster.append(b);}
+    }
+    function renderClues(){
+      clueGrid.replaceChildren();
+      clues.forEach((clue,i)=>{
+        const flip=state.revealed.includes(i),detail=state.detailed.includes(i);
+        const b=elem('button',`clue ${i===0?'feature ':''}${i===5?'final-clue':''}`);b.type='button';b.dataset.flipped=String(flip);b.dataset.detailed=String(detail);
+        b.setAttribute('aria-label',`Pista ${i+1}. ${flip?clue.text:clue.cover}. ${flip?'Ativar para nota adicional':'Ativar para revelar'}`);
+        b.setAttribute('aria-expanded',flip?'true':'false');
+        const top=elem('div');top.append(elem('span','clue-index',`${String(i+1).padStart(2,'0')} / ${flip?clue.detail:'Evidência lacrada'}`),elem('div','clue-title',flip?clue.text:clue.cover));
+        if(flip && detail)top.append(elem('div','clue-detail',clue.note));
+        b.append(top,elem('span','clue-action',!flip?'Revelar documento':!detail?'Ler nota investigativa':'Nota exibida'),elem('span','clue-icon',String(i+1).padStart(2,'0')));
+        b.addEventListener('click',()=>{
+          if(!state.revealed.includes(i))state.revealed.push(i);
+          else if(!state.detailed.includes(i))state.detailed.push(i);
+          else {state.revealed=state.revealed.filter(n=>n!==i);state.detailed=state.detailed.filter(n=>n!==i);}
+          save();renderClues();
+        });clueGrid.append(b);
+      });
+      progress.textContent=`${state.revealed.length} de ${clues.length} pistas reveladas`;
+    }
+    function fillSelect(id,data){const select=document.getElementById(id);for(const item of data){const option=document.createElement('option');option.value=item.id;option.textContent=item.name;select.append(option);}}
+    fillSelect('suspect-select',suspects);fillSelect('weapon-select',weapons);fillSelect('location-select',locations);
+    function showResult(kind,title,message){result.hidden=false;result.dataset.kind=kind;result.replaceChildren(elem('strong','',title),document.createTextNode(message));}
+    function finish(){
+      state.won=true;
+      for(const [group,arr] of Object.entries(mappings))for(let r=0;r<3;r++)for(let c=0;c<3;c++)state.marks[`${group}-${r}-${c}`]=arr[r]===c?2:1;
+      save();renderBoard();showResult('success','Caso encerrado.','Violeta Moura, no laboratório, transportava a maçã envenenada. Íris estava no gabinete com a bolsa; Caio, nos jardins com os óculos. Cada associação é consistente com as pistas.');
+    }
+    document.getElementById('accusation-form').addEventListener('submit',e=>{
+      e.preventDefault();const suspect=document.getElementById('suspect-select').value;const weapon=document.getElementById('weapon-select').value;const location=document.getElementById('location-select').value;
+      if(!suspect||!weapon||!location){showResult('error','Acusação incompleta.','Selecione culpado, objeto e local.');return;}
+      state.attempts++;save();
+      if(suspect===answer.suspect&&weapon===answer.weapon&&location===answer.location)finish();
+      else showResult('error','A hipótese não fecha.','Ao menos uma das três escolhas está incorreta. Releia os depoimentos e elimine as contradições na matriz.');
+    });
+    document.getElementById('clear-board').addEventListener('click',()=>{if(!confirm('Limpar todas as marcações da matriz? As pistas permanecerão abertas.'))return;state.marks={};state.won=false;save();renderBoard();result.hidden=true;});
+    document.getElementById('reveal-answer').addEventListener('click',()=>{if(state.won){result.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});return;}if(!confirm('Revelar o culpado e preencher a matriz? Essa ação encerra o desafio.'))return;document.getElementById('suspect-select').value=answer.suspect;document.getElementById('weapon-select').value=answer.weapon;document.getElementById('location-select').value=answer.location;finish();});
+    document.getElementById('btn-instructions').addEventListener('click',()=>{const target=document.getElementById('instructions-pt');target.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});target.style.borderLeftColor='#ffa3b6';setTimeout(()=>target.style.borderLeftColor='',1000);});
+    document.getElementById('toggle-hints').addEventListener('click',()=>{const note=document.getElementById('instructions-pt');const hidden=note.hidden;note.hidden=!hidden;document.getElementById('toggle-hints').textContent=hidden?'click here':'enable here';});
+    // Motion progressive enhancement: no dependency, no network.
+    const observer=typeof IntersectionObserver==='function'?new IntersectionObserver((entries)=>{for(const entry of entries)if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}},{threshold:.07}):null;
+    document.querySelectorAll('.reveal').forEach(el=>observer?observer.observe(el):el.classList.add('visible'));
+    if(!reduceMotion){document.querySelectorAll('[data-letters]').forEach(line=>{const text=line.dataset.letters;line.textContent='';[...text].forEach((char,i)=>{const s=elem('span','letter',char===' '?'\u00a0':char);s.style.setProperty('--i',i);s.setAttribute('aria-hidden','true');line.append(s);});});}
+    const observedCounters=new WeakSet();
+    if(!reduceMotion && typeof IntersectionObserver==='function'){
+      const countObserver=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(!entry.isIntersecting||observedCounters.has(entry.target))return;observedCounters.add(entry.target);countObserver.unobserve(entry.target);const final=Number(entry.target.dataset.count);const t0=performance.now();const animate=(now)=>{const p=Math.min(1,(now-t0)/750);entry.target.textContent=String(Math.round(final*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(animate);};requestAnimationFrame(animate);});});document.querySelectorAll('[data-count]').forEach(el=>countObserver.observe(el));
+    }
+    // Starfield capped to 30fps, pixel ratio <= 2, paused in hidden tabs.
+    const canvas=document.getElementById('starfield');const ctx=canvas.getContext('2d');let frame=0,stars=[],width=0,height=0,dpr=1,raf=0,visible=!document.hidden;
+    let seed=13142;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+    function resize(){width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.width=width+'px';canvas.style.height=height+'px';if(ctx)ctx.setTransform(dpr,0,0,dpr,0,0);seed=13142;stars=Array.from({length:Math.min(85,Math.floor(width*height/15500))},()=>({x:rand()*width,y:rand()*height,r:rand()*.95+.15,alpha:rand()*.17+.045,speed:rand()*.10+.035}));}
+    function draw(now){if(!ctx||!visible||reduceMotion)return;if(now-frame<1000/30){raf=requestAnimationFrame(draw);return;}frame=now;ctx.clearRect(0,0,width,height);for(const s of stars){s.y-=s.speed;if(s.y<0){s.y=height;s.x=rand()*width;}ctx.fillStyle=`rgba(255,220,228,${s.alpha})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}raf=requestAnimationFrame(draw);}
+    resize();if(ctx && !reduceMotion)raf=requestAnimationFrame(draw);
+    window.addEventListener('resize',()=>{resize();if(reduceMotion&&ctx)ctx.clearRect(0,0,width,height);},{passive:true});
+    document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(!visible){cancelAnimationFrame(raf);}else if(!reduceMotion&&ctx){frame=0;raf=requestAnimationFrame(draw);}});
+    const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');if(motionQuery.addEventListener)motionQuery.addEventListener('change',event=>{reduceMotion=event.matches;cancelAnimationFrame(raf);if(!reduceMotion&&visible)raf=requestAnimationFrame(draw);else if(ctx)ctx.clearRect(0,0,width,height);});
+    renderBoard();renderRoster();renderClues();if(state.won)finish();
+  })();
+  </script>
+  <script>
+  (() => {
+    'use strict';
+    const installButton = document.getElementById('pwa-install');
+    const dialog = document.getElementById('install-dialog');
+    const close = document.getElementById('install-close');
+    const status = document.getElementById('pwa-status');
+    const updateButton = document.getElementById('pwa-update');
+    const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const supportedHost = location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname);
+    installButton.addEventListener('click', () => dialog.showModal());
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+    function updateStatus() {
+      if (standalone()) status.textContent = navigator.onLine ? '✓ Instalado · Jogo disponível offline' : '✓ Instalado · Sem conexão, pronto para jogar';
+      else if (!supportedHost) status.textContent = 'Para instalar, publique em HTTPS. O HTML local segue jogável.';
+      else if (!('serviceWorker' in navigator)) status.textContent = 'Este navegador não oferece cache offline via service worker.';
+      else if (navigator.serviceWorker.controller) status.textContent = navigator.onLine ? '✓ Jogo disponível offline' : '✓ Sem internet · Jogo pronto';
+      else status.textContent = 'Preparando arquivos para acesso offline…';
+    }
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+    if (!supportedHost || !('serviceWorker' in navigator)) return;
+    let reloadForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloadForUpdate) window.location.reload();
+      else updateStatus();
+    });
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope:'./' });
+        navigator.serviceWorker.ready.then(updateStatus).catch(() => {});
+        const offerUpdate = () => {
+          if (reg.waiting && navigator.serviceWorker.controller) updateButton.hidden = false;
+        };
+        updateButton.addEventListener('click', () => {
+          if (!reg.waiting) return;
+          reloadForUpdate = true;
+          updateButton.disabled = true;
+          reg.waiting.postMessage({ type:'SKIP_WAITING' });
+        });
+        reg.addEventListener('updatefound', () => {
+          const worker = reg.installing;
+          if (!worker) return;
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed') offerUpdate();
+            updateStatus();
+          });
+        });
+        offerUpdate();
+        if (navigator.onLine) reg.update().catch(() => {});
+      } catch (_err) {
+        status.textContent = 'Instalação offline indisponível aqui. Confira a publicação HTTPS.';
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
